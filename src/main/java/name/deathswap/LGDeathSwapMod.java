@@ -1,26 +1,14 @@
 package name.deathswap;
 
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.gui.screen.DeathScreen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 ////////////
 import com.mojang.brigadier.CommandDispatcher;
@@ -28,44 +16,36 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.minecraft.advancement.criterion.EffectsChangedCriterion;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.predicate.entity.EntityEffectPredicate;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.EffectCommand;
+
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
+
 import net.minecraft.world.GameMode;
-import net.minecraft.world.chunk.Chunk;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
-
-import net.minecraft.world.World;
-
-import java.awt.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
 
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import org.apache.logging.log4j.core.jmx.Server;
+import java.util.List;
+
 
 
 
 public class LGDeathSwapMod implements ModInitializer
 {
-    public static final Logger LOGGER = LogManager.getLogger("death-swap-mod");
+    private static final Logger LOGGER = LogManager.getLogger("death-swap-mod");
+
+	public Logger getLOGGER()
+	{
+		return LOGGER;
+	}
 
 	private static LGDeathSwapMod _instance = null;
 
@@ -76,13 +56,19 @@ public class LGDeathSwapMod implements ModInitializer
 
 	int deathSwapTime = 300;
 
-	public boolean isGameStarting = false;
+	private boolean _isGameStarting = false;
+
+	public boolean getIsGameStarting()
+	{
+		return _isGameStarting;
+	}
+
+	public void setIsGameStarting(boolean value)
+	{
+		_isGameStarting = value;
+	}
 
 	long startTime = 0;
-
-	//private ServerTickEvents.StartTick swapTick;
-
-	//String winText = "No Winner";
 
 	public int playerNum = 0;
 
@@ -91,9 +77,8 @@ public class LGDeathSwapMod implements ModInitializer
 
 	String _modName = "DeathSwap";
 
-	String _modVersion = "2.0";
-	//List<BlockPos> safePos = null;
-	String _lastEditTime = "2024/12/07";
+	String _modVersion = "2.0.1";
+	String _lastEditTime = "2024/12/08";
 
 	String []_modInfo = {_modAuthor,_modName,_modVersion,_lastEditTime};
 
@@ -112,15 +97,13 @@ public class LGDeathSwapMod implements ModInitializer
 			return;
 		}
 		_instance = this;
-		//PlayerDeathCallback.EVENT.register(this::onPlayerDeath);
 		System.out.println("init PlayerHealthDetectionAsync");
 
 		ServerLifecycleEvents.SERVER_STARTED.register(this::initPlayerHealthDetectionAsync);
 		ServerLifecycleEvents.SERVER_STOPPED.register(this::stopPlayerHealthDetectionAsync);
 		System.out.println("init onServerTick");
 		ServerTickEvents.START_SERVER_TICK.register(this::onServerTick);
-		//PlayerDeathCallback.EVENT.register(this::onPlayerDeath);
-		//ServerTickEvents.START_SERVER_TICK.register(this::onPlayerWin);
+
 		CommandRegistrationCallback.EVENT.register(this::editSwapTime);
 		CommandRegistrationCallback.EVENT.register(this::editGameMode);
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
@@ -154,15 +137,15 @@ public class LGDeathSwapMod implements ModInitializer
 	}
 	private void initPlayerHealthDetectionAsync(MinecraftServer server)
 	{
-		System.out.println("Init PlayerHealthDetectionAsync");
-		PlayerHealthDetectionAsync.initInstance(server);
-		PlayerHealthDetectionAsync.getInstance().startThread();
+		System.out.println("Init PlayerHealthDetectionThread");
+		PlayerHealthDetectionThread.initInstance(server);
+		PlayerHealthDetectionThread.getInstance().startThread();
 	}
 	private void stopPlayerHealthDetectionAsync(MinecraftServer server)
 	{
-		System.out.println("Stop PlayerHealthDetectionAsync");
-		isGameStarting = false;
-		PlayerHealthDetectionAsync.getInstance().stopTread();
+		System.out.println("Stop PlayerHealthDetectionThread");
+		_isGameStarting = false;
+		PlayerHealthDetectionThread.getInstance().stopTread();
 		System.gc();
 	}
 
@@ -174,7 +157,7 @@ public class LGDeathSwapMod implements ModInitializer
 		dispatcher.register(CommandManager.literal("setswaptime")
 				.then(CommandManager.argument("value", IntegerArgumentType.integer())
 						.executes(context -> {
-							if(isGameStarting)
+							if(_isGameStarting)
 							{
 								context.getSource().sendFeedback(new LiteralText("游戏正在进行，不能更改时间"), false);
 								return 1;
@@ -200,7 +183,7 @@ public class LGDeathSwapMod implements ModInitializer
 		dispatcher.register(CommandManager.literal("gamemode")
 				.then(CommandManager.argument("gamemodeValue", StringArgumentType.word())
 						.executes(context -> {
-							if(isGameStarting)
+							if(_isGameStarting)
 							{
 								context.getSource().sendFeedback(new LiteralText("Game is starting, can't change game mode to "), false);
 								return 1;
@@ -255,10 +238,7 @@ public class LGDeathSwapMod implements ModInitializer
 	private void initStartGame(boolean needTransPos,ServerCommandSource source)
 	{
 		startTime = Instant.now().getEpochSecond();
-		//winText = "No Winner";
 		MinecraftServer server = source.getMinecraftServer();
-		//server.getGameRules().get(GameRules.DO_IMMEDIATE_RESPAWN).set(true, server);
-		//World world = server.getWorld(World.OVERWORLD);
 		List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
 		playerNum = players.size();
 		if (players.size() < 2)
@@ -268,17 +248,10 @@ public class LGDeathSwapMod implements ModInitializer
 			players.get(0).sendMessage(msg,true);
 			return;
 		}
-
-		//ServerTickEvents.START_SERVER_TICK.register(this::onServerTick);
-
 		for (ServerPlayerEntity player : players)
 		{
 			Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.RED);
 			player.sendMessage(msg,true);
-			Random random = new Random();
-			//BlockPos blockPos = findSafePos(random.nextInt(5000),50, random.nextInt(5000));
-			//BlockPos blockPos = findSafePos();
-			//player.teleport(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 			player.setInvulnerable(true);
 			if(needTransPos)
 			{
@@ -286,17 +259,19 @@ public class LGDeathSwapMod implements ModInitializer
 				TransAsyncThread asyncThread = new TransAsyncThread(player,world);
 				asyncThread.start();
 			}
+			else
+			{
+				player.setInvulnerable(false);
+			}
 			player.setGameMode(GameMode.SURVIVAL);
 			player.setHealth(20);
 			player.getHungerManager().setFoodLevel(20);
 			player.getHungerManager().setSaturationLevel(1.0F);
-			//player.clearActiveItem();
 			player.inventory.clear();
-			player.setInvulnerable(false);
 			msg = new LiteralText("游戏开始!").formatted(Formatting.YELLOW);
 			player.sendMessage(msg,true);
 		}
-		isGameStarting = true;
+		_isGameStarting = true;
 	}
 	private void startGame(ServerCommandSource source)
 	{
@@ -308,60 +283,6 @@ public class LGDeathSwapMod implements ModInitializer
 		initStartGame(false,source);
 	}
 
-
-	/*private void onPlayerWin(MinecraftServer server)
-	{
-		if(!isGameStarting)
-		{
-			return;
-		}
-		int SurvalPlayerNum=0;
-		ServerPlayerEntity tmpPlayer = null;
-		List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
-		for(ServerPlayerEntity player : players)
-		{
-			if (player.interactionManager.getGameMode() == GameMode.SURVIVAL)
-			{
-				SurvalPlayerNum++;
-				tmpPlayer = player;
-			}
-		}
-
-		if(SurvalPlayerNum==0)
-		{
-			for(ServerPlayerEntity player : players)
-			{
-				Text msg2 = new LiteralText(winText).formatted(Formatting.YELLOW);
-				player.sendMessage(msg2,true);
-				isGameStarting = false;
-			}
-		}
-		if(SurvalPlayerNum==1&&players.size()!=1)
-		{
-
-			Text msg = new LiteralText("You Win").formatted(Formatting.YELLOW);
-			tmpPlayer.sendMessage(msg,false);
-			tmpPlayer.setGameMode(GameMode.SPECTATOR);
-			winText = "Winner is:" + tmpPlayer.getGameProfile().getName().toString();
-			for(ServerPlayerEntity player : players)
-			{
-				Text msg2 = new LiteralText("胜利者是:" + tmpPlayer.getGameProfile().getName().toString()).formatted(Formatting.YELLOW);
-				player.sendMessage(msg2,true);
-				//player.playSound(net.minecraft.sound.SoundEvents.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-				playAnvilFallSound(player,SoundEvents.ENTITY_PLAYER_LEVELUP);
-				//player.sendMessage(new LiteralText("Winner is " + tmpPlayer.getGameProfile().getName().toString()), true);
-				//ServerTickEvents.END_SERVER_TICK.register(this::onServerTick);
-				//ServerTickEvents.END_SERVER_TICK.register(this::playerHealthDetection);
-
-
-			}
-			isGameStarting = false;
-		}
-
-
-	}*/
-
-
 	public void playAnvilFallSound(ServerPlayerEntity player,SoundEvent soundEvent)
 	{
 		World world = player.getEntityWorld();
@@ -370,7 +291,7 @@ public class LGDeathSwapMod implements ModInitializer
 		world.playSound(null, player.getX(), player.getY(), player.getZ(), soundEvent, SoundCategory.BLOCKS, 1.0F, 1.0F);
 	}
 
-	void sendMSGForEveryPlayer(MinecraftServer server,String str)
+	public void sendMSGForEveryPlayer(MinecraftServer server,String str)
 	{
 		List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
 		for (ServerPlayerEntity player : players)
@@ -383,26 +304,17 @@ public class LGDeathSwapMod implements ModInitializer
 		}
 	}
 
-	private void onPlayerDeath(ServerPlayerEntity player, DamageSource source)
-	{
-
-		player.setGameMode(GameMode.SPECTATOR);
-		Text msg = new LiteralText("You Death").formatted(Formatting.YELLOW);
-		player.sendMessage(msg,true);
-	}
-
-
 	boolean shouldSendMSG = true;
 	private void onServerTick(MinecraftServer minecraftServer)
 	{
-		if(!isGameStarting)
+		if(!_isGameStarting)
 		{
 			return;
 		}
 		//LOGGER.info("server tick running");
 		long nowUnixTime = Instant.now().getEpochSecond();
 		long deltaTime = nowUnixTime - startTime;
-
+		//以下是屎山代码
 		if (deltaTime==deathSwapTime-1&&shouldSendMSG)
 		{
 			sendMSGForEveryPlayer(minecraftServer,"交换将在1秒后开始");
@@ -431,6 +343,7 @@ public class LGDeathSwapMod implements ModInitializer
 
 		if(deltaTime== deathSwapTime)
 		{
+			System.out.println("Swap");
 			LOGGER.info("Swap");
 			startTime = Instant.now().getEpochSecond();
 			swapPlayerPos(minecraftServer.getPlayerManager().getPlayerList());
@@ -444,5 +357,5 @@ public class LGDeathSwapMod implements ModInitializer
 	}
 }
 
-//LZX completed this code in 2024/12/07
+//LZX completed this code in 2024/12/08
 //LZX-TC-2024-03-21-001

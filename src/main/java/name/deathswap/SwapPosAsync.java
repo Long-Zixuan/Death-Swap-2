@@ -2,50 +2,17 @@ package name.deathswap;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.Random;
 
-
-
-
-
-
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import net.fabricmc.api.ModInitializer;
-
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.minecraft.advancement.criterion.EffectsChangedCriterion;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.predicate.entity.EntityEffectPredicate;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.EffectCommand;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
+
 import net.minecraft.world.GameMode;
-import net.minecraft.world.chunk.Chunk;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-
-
-import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Random;
 
-import static name.deathswap.LGDeathSwapMod.LOGGER;
 
 
 public class SwapPosAsync extends Thread {
@@ -74,7 +41,7 @@ public class SwapPosAsync extends Thread {
 
         if (alivePlayers.size() < 2)
         {
-            LOGGER.info("没有足够的玩家进行游戏");
+            LGDeathSwapMod.getInstance().getLOGGER().info("没有足够的玩家进行游戏");
             Text msg = new LiteralText("没有足够的玩家进行游戏").formatted(Formatting.YELLOW);
             _players.get(0).sendMessage(msg,false);
             return;

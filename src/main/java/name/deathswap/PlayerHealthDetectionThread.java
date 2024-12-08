@@ -1,14 +1,5 @@
 package name.deathswap;
 
-import name.deathswap.LGDeathSwapMod;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.advancement.Advancement;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.screen.DeathScreen;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -16,17 +7,17 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
+
 import net.minecraft.world.GameMode;
-import net.minecraft.world.World;
+
 
 import java.util.List;
-import java.util.Random;
 
-public class PlayerHealthDetectionAsync implements Runnable
+
+public class PlayerHealthDetectionThread implements Runnable
 {
-    private static PlayerHealthDetectionAsync _instance = null;
-    public static PlayerHealthDetectionAsync initInstance(MinecraftServer server)
+    private static PlayerHealthDetectionThread _instance = null;
+    public static void initInstance(MinecraftServer server)
     {
         if(_instance!=null)
         {
@@ -34,15 +25,14 @@ public class PlayerHealthDetectionAsync implements Runnable
             _instance = null;
             System.gc();
         }
-        _instance = new PlayerHealthDetectionAsync(server);
-        return _instance;
+        _instance = new PlayerHealthDetectionThread(server);
     }
 
-    public static PlayerHealthDetectionAsync getInstance()
+    public static PlayerHealthDetectionThread getInstance()
     {
         if(_instance==null)
         {
-            LGDeathSwapMod.getInstance().LOGGER.error("PlayerHealthDetectionAsync haven't been initialized");
+            LGDeathSwapMod.getInstance().getLOGGER().error("PlayerHealthDetectionAsync haven't been initialized");
         }
         return _instance;
     }
@@ -50,7 +40,7 @@ public class PlayerHealthDetectionAsync implements Runnable
     Thread _thread;
     public void startThread()
     {
-        _thread = new Thread(this);
+        _thread = new Thread(this,"PlayerHealthDetection Thread");
         _thread.start();
     }
 
@@ -67,7 +57,7 @@ public class PlayerHealthDetectionAsync implements Runnable
     {
         while(_running)
         {
-            System.out.println("PlayerHealthDetectionAsync is running \nisGameStarting:"+LGDeathSwapMod.getInstance().isGameStarting);
+            System.out.println("PlayerHealthDetectionAsync is running \nisGameStarting:"+LGDeathSwapMod.getInstance().getIsGameStarting());
             playerHealthDetection();
             try
             {
@@ -81,10 +71,7 @@ public class PlayerHealthDetectionAsync implements Runnable
         }
     }
 
-    /*void initMinecraftServer(MinecraftServer server)
-    {
-        _server = server;
-    }*/
+
     @Override
     public void run()
     {
@@ -92,13 +79,11 @@ public class PlayerHealthDetectionAsync implements Runnable
     }
     private MinecraftServer _server;
 
-    //private String[] _modInfo;
 
-    private PlayerHealthDetectionAsync(MinecraftServer server)
+    private PlayerHealthDetectionThread(MinecraftServer server)
     {
         super();
         _server = server;
-        //ServerLifecycleEvents.SERVER_STARTING.register(this::initMinecraftServer);
     }
 
 
@@ -107,7 +92,7 @@ public class PlayerHealthDetectionAsync implements Runnable
     private void playerHealthDetection()
     {
         List<ServerPlayerEntity> players = _server.getPlayerManager().getPlayerList();
-        if(!LGDeathSwapMod.getInstance().isGameStarting)
+        if(!LGDeathSwapMod.getInstance().getIsGameStarting())
         {
 
             if(players.size()>LGDeathSwapMod.getInstance().playerNum)
@@ -149,17 +134,14 @@ public class PlayerHealthDetectionAsync implements Runnable
         float tmpYaw = player.getYaw(0);
         float tmpPitch = player.getPitch(0);
         ServerWorld tmpWorld = player.getServerWorld();
-        //player.stopUsingItem();
-        //DeathScreen tmpScreen = new DeathScreen(new LiteralText("You Death"),false);
 
-        //player.closeScreenHandler();
         player.setHealth(20);
         player.teleport(tmpWorld,tmpX,tmpY,tmpZ,tmpYaw,tmpPitch);
     }
 
     private void onPlayerWin()
     {
-        if(!LGDeathSwapMod.getInstance().isGameStarting)
+        if(!LGDeathSwapMod.getInstance().getIsGameStarting())
         {
             return;
         }
@@ -183,7 +165,7 @@ public class PlayerHealthDetectionAsync implements Runnable
                 Text msg2 = new LiteralText(winText).formatted(Formatting.YELLOW);
                 player.sendMessage(msg2,true);
             }
-            LGDeathSwapMod.getInstance().isGameStarting = false;
+            LGDeathSwapMod.getInstance().setIsGameStarting(false);
         }
         if(SurvalPlayerNum==1&&players.size()!=1)
         {
@@ -196,15 +178,9 @@ public class PlayerHealthDetectionAsync implements Runnable
             {
                 Text msg2 = new LiteralText("胜利者是:" + tmpPlayer.getGameProfile().getName().toString()).formatted(Formatting.YELLOW);
                 player.sendMessage(msg2,true);
-                //player.playSound(net.minecraft.sound.SoundEvents.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                 LGDeathSwapMod.getInstance().playAnvilFallSound(player, SoundEvents.ENTITY_PLAYER_LEVELUP);
-                //player.sendMessage(new LiteralText("Winner is " + tmpPlayer.getGameProfile().getName().toString()), true);
-                //ServerTickEvents.END_SERVER_TICK.register(this::onServerTick);
-                //ServerTickEvents.END_SERVER_TICK.register(this::playerHealthDetection);
-
-
             }
-            LGDeathSwapMod.getInstance().isGameStarting = false;
+            LGDeathSwapMod.getInstance().setIsGameStarting(false);
         }
 
 
@@ -212,5 +188,5 @@ public class PlayerHealthDetectionAsync implements Runnable
 
 }
 
-//LZX completed this code in 2024/12/07
+//LZX completed this code in 2024/12/08
 //LZX-TC-2024-03-21-002

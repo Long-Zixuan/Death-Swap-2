@@ -28,6 +28,7 @@ public class TransAsyncThread extends Thread
         {
             _player.teleport(safePos.getX(), safePos.getY() + 1, safePos.getZ());
         }
+        _player.setInvulnerable(false);
     }
     private final ServerPlayerEntity _player;
     private final World _world;
@@ -59,7 +60,7 @@ public class TransAsyncThread extends Thread
 
         }
         System.out.println(_player.toString()+" SafePos:"+blockPos.toString());
-        System.out.println(_player.toString()+" SafePos:"+block.toString());
+        System.out.println(_player.toString()+" SafeBlock:"+block.toString());
         if(blockPos.getY()<=0)
         {
             _findPosCount++;
@@ -70,5 +71,5 @@ public class TransAsyncThread extends Thread
     }
 }
 
-//LZX completed this code in 2024/12/07
+//LZX completed this code in 2024/12/08
 //LZX-TC-2024-03-21-002
