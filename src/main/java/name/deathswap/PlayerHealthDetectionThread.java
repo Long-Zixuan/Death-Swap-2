@@ -18,17 +18,6 @@ import static name.deathswap.LGDeathSwapMod.LOGGER;
 public class PlayerHealthDetectionThread implements Runnable
 {
     private static PlayerHealthDetectionThread _instance = null;
-    /*public static void initInstance(MinecraftServer server)
-    {
-        if(_instance!=null)
-        {
-            _instance.stopTread();
-            _instance = null;
-            System.gc();
-        }
-        _instance = new PlayerHealthDetectionThread(server);
-    }*/
-
     public static PlayerHealthDetectionThread getInstance()
     {
         if(_instance==null)
@@ -48,11 +37,13 @@ public class PlayerHealthDetectionThread implements Runnable
     {
         _thread = new Thread(this,"PlayerHealthDetection Thread");
         _thread.start();
-        System.out.println("PlayerHealthDetectionThread Thread Name:"+_thread.getName()+" Thread ID:"+_thread.getId());
+        System.out.println("PlayerHealthDetectionThread");
+        System.out.println("Thread Name"+"\t"+_thread.getName());
+        System.out.println("Thread ID"+"\t"+_thread.getId());
     }
 
-    String winText = "No Winner";
-    private volatile boolean _running = true;//CSDN说加个volatile，那我就加咯，嘻嘻
+    String _winText = "No Winner";
+    private volatile boolean _running = true;//CSDN说加个volatile比较好，那我就加咯，嘻嘻
     private final int SLEEP_TIME = 500;//半秒
 
     //private LGDeathSwapMod lgDeathSwapModInstance = LGDeathSwapMod.getInstance();
@@ -102,7 +93,7 @@ public class PlayerHealthDetectionThread implements Runnable
         {
             if(players.size()>LGDeathSwapMod.getInstance().getPlayerNum())
             {
-                players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.getInstance().getModInfo()[0]+":欢迎加入死亡交换游戏！").formatted(Formatting.YELLOW),false);
+                players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.MOD_INFO[0]+":欢迎加入死亡交换游戏！").formatted(Formatting.YELLOW),false);
             }
             LGDeathSwapMod.getInstance().setPlayerNum(players.size());
             return;
@@ -111,7 +102,7 @@ public class PlayerHealthDetectionThread implements Runnable
         {
             if(players.size()>LGDeathSwapMod.getInstance().getPlayerNum())
             {
-                players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.getInstance().getModInfo()[0]+":欢迎加入死亡交换游戏！游戏已经开始，你现在处于旁观模式").formatted(Formatting.YELLOW),false);
+                players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.MOD_INFO[0]+":欢迎加入死亡交换游戏！游戏已经开始，你现在处于旁观模式").formatted(Formatting.YELLOW),false);
                 players.get(players.size()-1).setGameMode(GameMode.SPECTATOR);
             }
             LGDeathSwapMod.getInstance().setPlayerNum(players.size());
@@ -166,10 +157,10 @@ public class PlayerHealthDetectionThread implements Runnable
         if(SurvalPlayerNum==0)
         {
             System.out.println("No Winner");
-            winText = "No winner";
+            _winText = "No winner";
             for(ServerPlayerEntity player : players)
             {
-                Text msg2 = new LiteralText(winText).formatted(Formatting.YELLOW);
+                Text msg2 = new LiteralText(_winText).formatted(Formatting.YELLOW);
                 player.sendMessage(msg2,true);
             }
             LGDeathSwapMod.getInstance().setIsGameStarting(false);
@@ -180,10 +171,10 @@ public class PlayerHealthDetectionThread implements Runnable
             Text msg = new LiteralText("You Win").formatted(Formatting.YELLOW);
             tmpPlayer.sendMessage(msg,false);
             tmpPlayer.setGameMode(GameMode.SPECTATOR);
-            winText = "Winner is:" + tmpPlayer.getGameProfile().getName().toString();
+            _winText = "Winner is:" + tmpPlayer.getGameProfile().getName();
             for(ServerPlayerEntity player : players)
             {
-                Text msg2 = new LiteralText("胜利者是:" + tmpPlayer.getGameProfile().getName().toString()).formatted(Formatting.YELLOW);
+                Text msg2 = new LiteralText("胜利者是:" + tmpPlayer.getGameProfile().getName()).formatted(Formatting.YELLOW);
                 player.sendMessage(msg2,true);
                 LGDeathSwapMod.getInstance().playAnvilFallSound(player, SoundEvents.ENTITY_PLAYER_LEVELUP);
             }

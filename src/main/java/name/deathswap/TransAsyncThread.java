@@ -23,11 +23,17 @@ public class TransAsyncThread extends Thread
     @Override
     public void run()
     {
-        System.out.println("TransAsyncThread  Thread Name:" + getName()+" Thread ID:"+ getId());
+        System.out.println("TransAsyncThread");
+        System.out.println("Thread Name"+"\t"+getName());
+        System.out.println("Thread ID"+"\t"+getId());
+        Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.YELLOW);
+        _player.sendMessage(msg,true);
         BlockPos safePos = findSafePos();
         if(safePos.getY() != ERROR_POS)
         {
             _player.teleport(safePos.getX(), safePos.getY() + 1, safePos.getZ());
+            msg = new LiteralText("游戏开始！").formatted(Formatting.YELLOW);
+            _player.sendMessage(msg,true);
         }
         _player.setInvulnerable(false);
     }
@@ -73,8 +79,8 @@ public class TransAsyncThread extends Thread
             block = _world.getBlockState(blockPos).getBlock();
 
         }
-        System.out.println(_player.toString()+" SafePos:"+blockPos.toString());
-        System.out.println(_player.toString()+" SafeBlock:"+block.toString());
+        System.out.println(_player.toString()+" SafePos:"+blockPos);
+        System.out.println(_player+" SafeBlock:"+block);
         if(blockPos.getY()<=0 || isDangerousBlock(block))
         {
             _findPosCount++;

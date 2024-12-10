@@ -49,47 +49,36 @@ public class LGDeathSwapMod implements ModInitializer
 		return _instance;
 	}
 
-	int deathSwapTime = 300;
+	private static final String MOD_AUTHOR = "LoongLy";
+	private static final String MOD_NAME = "DeathSwap";
+	private static final String MOD_VERSION = "2.1";
+	private static final String MOD_LAST_EDIT_TIME = "2024/12/10";
+	public static final String []MOD_INFO = {MOD_AUTHOR,MOD_NAME,MOD_VERSION,MOD_LAST_EDIT_TIME};
+
+	int _deathSwapTime = 300;
 
 	private boolean _isGameStarting = false;
-
 	public boolean getIsGameStarting()
 	{
 		return _isGameStarting;
 	}
-
 	public void setIsGameStarting(boolean value)
 	{
 		_isGameStarting = value;
 	}
 
-	long startTime = 0;
+	long _startTime = 0;
 
 	private int _playerNum = 0;
-
 	public int getPlayerNum()
 	{
 		return _playerNum;
 	}
-
 	public void setPlayerNum(int value)
 	{
 		_playerNum = value;
 	}
 
-	//World world;
-	String _modAuthor = "LoongLy";
-
-	String _modName = "DeathSwap";
-
-	String _modVersion = "2.1";
-	String _lastEditTime = "2024/12/10";
-
-	String []_modInfo = {_modAuthor,_modName,_modVersion,_lastEditTime};
-	public String[] getModInfo()
-	{
-		return _modInfo;
-	}
 
 	private MinecraftServer _server = null;
 
@@ -146,7 +135,7 @@ public class LGDeathSwapMod implements ModInitializer
 					}));
 		});
 
-		LOGGER.info("I am LZX(LoongLy),Hello Fabric world!\nInitialize DeathSwap mod completed!");
+		LOGGER.info("I am LZX(LoongLy),Hello Fabric world!  Initialize DeathSwap mod "+ MOD_VERSION +" completed!");
 	}
 	private void initPlayerHealthDetectionAsync(MinecraftServer server)
 	{
@@ -198,7 +187,7 @@ public class LGDeathSwapMod implements ModInitializer
 								return 1;
 							}
 							// 更新变量的值
-							deathSwapTime = swaptime;
+							_deathSwapTime = swaptime;
 							// 发送消息给执行命令的玩家
 							context.getSource().sendFeedback(new LiteralText("交换时间更新为： " + swaptime), false);
 							return 1;
@@ -249,7 +238,7 @@ public class LGDeathSwapMod implements ModInitializer
 
 	private void AboutMod(ServerCommandSource source)
 	{
-		Text msg = new LiteralText("Death Swap 版本:"+_modVersion+" 作者:"+_modAuthor+"(Lagging_Warrior)  最后一次更新时间"+_lastEditTime).formatted(Formatting.YELLOW);
+		Text msg = new LiteralText("Death Swap 版本:"+MOD_VERSION+" 作者:"+MOD_AUTHOR+"(Lagging_Warrior)  最后一次更新时间"+MOD_LAST_EDIT_TIME).formatted(Formatting.YELLOW);
 		source.sendFeedback(msg, false);
 		Text msg2 = new LiteralText("下载链接(更新中): https://mod.3dmgame.com/mod/207510").styled(style->style
 			.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://mod.3dmgame.com/mod/207510"))
@@ -265,7 +254,7 @@ public class LGDeathSwapMod implements ModInitializer
 
 	private void initStartGame(boolean needTransPos,ServerCommandSource source)
 	{
-		startTime = Instant.now().getEpochSecond();
+		_startTime = Instant.now().getEpochSecond();
 		MinecraftServer server = source.getMinecraftServer();
 		List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
 		_playerNum = players.size();
@@ -278,8 +267,8 @@ public class LGDeathSwapMod implements ModInitializer
 		}
 		for (ServerPlayerEntity player : players)
 		{
-			Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.RED);
-			player.sendMessage(msg,true);
+			//Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.RED);
+			//player.sendMessage(msg,true);
 			player.setInvulnerable(true);
 			if(needTransPos)
 			{
@@ -290,14 +279,17 @@ public class LGDeathSwapMod implements ModInitializer
 			else
 			{
 				player.setInvulnerable(false);
+				Text msg = new LiteralText("游戏开始!").formatted(Formatting.YELLOW);
+				player.sendMessage(msg,true);
 			}
 			player.setGameMode(GameMode.SURVIVAL);
 			player.setHealth(20);
+			player.setAir(300);
 			player.getHungerManager().setFoodLevel(20);
 			player.getHungerManager().setSaturationLevel(1.0F);
 			player.inventory.clear();
-			msg = new LiteralText("游戏开始!").formatted(Formatting.YELLOW);
-			player.sendMessage(msg,true);
+			//msg = new LiteralText("游戏开始!").formatted(Formatting.YELLOW);
+			//player.sendMessage(msg,true);
 		}
 		_isGameStarting = true;
 	}
@@ -341,39 +333,39 @@ public class LGDeathSwapMod implements ModInitializer
 		}
 		//LOGGER.info("server tick running");
 		long nowUnixTime = Instant.now().getEpochSecond();
-		long deltaTime = nowUnixTime - startTime;
+		long deltaTime = nowUnixTime - _startTime;
 		//以下是屎山代码
-		if (deltaTime==deathSwapTime-1&&shouldSendMSG)
+		if (deltaTime==_deathSwapTime-1&&shouldSendMSG)
 		{
 			sendMSGForEveryPlayer(minecraftServer,"交换将在1秒后开始");
 			shouldSendMSG = false;
 		}
-		else if (deltaTime==deathSwapTime-2&&!shouldSendMSG)
+		else if (deltaTime==_deathSwapTime-2&&!shouldSendMSG)
 		{
 			sendMSGForEveryPlayer(minecraftServer,"交换将在2秒后开始");
 			shouldSendMSG = true;
 		}
-		else if (deltaTime==deathSwapTime-3&&shouldSendMSG)
+		else if (deltaTime==_deathSwapTime-3&&shouldSendMSG)
 		{
 			sendMSGForEveryPlayer(minecraftServer,"交换将在3秒后开始");
 			shouldSendMSG = false;
 		}
-		else if (deltaTime==deathSwapTime-4&&!shouldSendMSG)
+		else if (deltaTime==_deathSwapTime-4&&!shouldSendMSG)
 		{
 			sendMSGForEveryPlayer(minecraftServer,"交换将在4秒后开始");
 			shouldSendMSG = true;
 		}
-		else if (deltaTime==deathSwapTime-5&&shouldSendMSG)
+		else if (deltaTime==_deathSwapTime-5&&shouldSendMSG)
 		{
 			sendMSGForEveryPlayer(minecraftServer,"交换将在5秒后开始");
 			shouldSendMSG = false;
 		}
 
-		if(deltaTime== deathSwapTime)
+		if(deltaTime== _deathSwapTime)
 		{
 			System.out.println("Swap");
 			LOGGER.info("Swap");
-			startTime = Instant.now().getEpochSecond();
+			_startTime = Instant.now().getEpochSecond();
 			swapPlayerPos(minecraftServer.getPlayerManager().getPlayerList());
 			shouldSendMSG = true;
 		}

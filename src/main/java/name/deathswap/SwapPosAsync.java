@@ -20,7 +20,9 @@ public class SwapPosAsync extends Thread {
     @Override
     public void run()
     {
-        System.out.println("SwapPosAsync  Thread Name:" + getName()+" Thread ID:"+ getId());
+        System.out.println("SwapPosAsync");
+        System.out.println("Thread Name"+"\t"+getName());
+        System.out.println("Thread ID"+"\t"+getId());
         swapPos();
     }
     List<ServerPlayerEntity> _players;
