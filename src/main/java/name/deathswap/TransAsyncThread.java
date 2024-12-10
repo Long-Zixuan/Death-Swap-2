@@ -21,8 +21,9 @@ public class TransAsyncThread extends Thread
     private final int ERROR_POS = 1000;
 
     @Override
-    public void start()
+    public void run()
     {
+        System.out.println("TransAsyncThread  Thread Name:" + getName()+" Thread ID:"+ getId());
         BlockPos safePos = findSafePos();
         if(safePos.getY() != ERROR_POS)
         {
@@ -39,6 +40,19 @@ public class TransAsyncThread extends Thread
     }
 
     private int _findPosCount = 0;
+
+    private Block[] _dangerousBlock = new Block[]{Blocks.LAVA,Blocks.FIRE};
+    private boolean isDangerousBlock(Block block)
+    {
+        for(Block b : _dangerousBlock)
+        {
+            if(b.is(block))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     private BlockPos findSafePos()
     {
         if(_findPosCount > 10)
@@ -61,14 +75,17 @@ public class TransAsyncThread extends Thread
         }
         System.out.println(_player.toString()+" SafePos:"+blockPos.toString());
         System.out.println(_player.toString()+" SafeBlock:"+block.toString());
-        if(blockPos.getY()<=0)
+        if(blockPos.getY()<=0 || isDangerousBlock(block))
         {
             _findPosCount++;
-            System.out.println("findPos Failed:"+_findPosCount);
+            System.out.println(_player + " findPos Failed:"+_findPosCount);
             return findSafePos();
         }
         return blockPos;
     }
+
+
+
 }
 
 //LZX completed this code in 2024/12/08

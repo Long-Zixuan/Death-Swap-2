@@ -13,11 +13,12 @@ import net.minecraft.world.GameMode;
 
 import java.util.List;
 
+import static name.deathswap.LGDeathSwapMod.LOGGER;
 
 public class PlayerHealthDetectionThread implements Runnable
 {
     private static PlayerHealthDetectionThread _instance = null;
-    public static void initInstance(MinecraftServer server)
+    /*public static void initInstance(MinecraftServer server)
     {
         if(_instance!=null)
         {
@@ -26,13 +27,18 @@ public class PlayerHealthDetectionThread implements Runnable
             System.gc();
         }
         _instance = new PlayerHealthDetectionThread(server);
-    }
+    }*/
 
     public static PlayerHealthDetectionThread getInstance()
     {
         if(_instance==null)
         {
-            LGDeathSwapMod.getInstance().getLOGGER().error("PlayerHealthDetectionAsync haven't been initialized");
+            if(LGDeathSwapMod.getInstance().getMinecraftServer() == null)
+            {
+                LOGGER.error("MinecraftServer is null");
+                return null;
+            }
+            _instance = new PlayerHealthDetectionThread();
         }
         return _instance;
     }
@@ -42,11 +48,14 @@ public class PlayerHealthDetectionThread implements Runnable
     {
         _thread = new Thread(this,"PlayerHealthDetection Thread");
         _thread.start();
+        System.out.println("PlayerHealthDetectionThread Thread Name:"+_thread.getName()+" Thread ID:"+_thread.getId());
     }
 
     String winText = "No Winner";
     private volatile boolean _running = true;//CSDN说加个volatile，那我就加咯，嘻嘻
     private final int SLEEP_TIME = 500;//半秒
+
+    //private LGDeathSwapMod lgDeathSwapModInstance = LGDeathSwapMod.getInstance();
     public void stopTread()
     {
         _running = false;
@@ -57,7 +66,7 @@ public class PlayerHealthDetectionThread implements Runnable
     {
         while(_running)
         {
-            System.out.println("PlayerHealthDetectionAsync is running \nisGameStarting:"+LGDeathSwapMod.getInstance().getIsGameStarting());
+            //System.out.println("PlayerHealthDetectionAsync is running \nisGameStarting:"+LGDeathSwapMod.getInstance().getIsGameStarting());
             playerHealthDetection();
             try
             {
@@ -77,13 +86,10 @@ public class PlayerHealthDetectionThread implements Runnable
     {
         TreadMainLogic();
     }
-    private MinecraftServer _server;
 
-
-    private PlayerHealthDetectionThread(MinecraftServer server)
+    private PlayerHealthDetectionThread()
     {
         super();
-        _server = server;
     }
 
 
@@ -91,25 +97,24 @@ public class PlayerHealthDetectionThread implements Runnable
 
     private void playerHealthDetection()
     {
-        List<ServerPlayerEntity> players = _server.getPlayerManager().getPlayerList();
+        List<ServerPlayerEntity> players = LGDeathSwapMod.getInstance().getMinecraftServer().getPlayerManager().getPlayerList();
         if(!LGDeathSwapMod.getInstance().getIsGameStarting())
         {
-
-            if(players.size()>LGDeathSwapMod.getInstance().playerNum)
+            if(players.size()>LGDeathSwapMod.getInstance().getPlayerNum())
             {
                 players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.getInstance().getModInfo()[0]+":欢迎加入死亡交换游戏！").formatted(Formatting.YELLOW),false);
             }
-            LGDeathSwapMod.getInstance().playerNum = players.size();
+            LGDeathSwapMod.getInstance().setPlayerNum(players.size());
             return;
         }
         else
         {
-            if(players.size()>LGDeathSwapMod.getInstance().playerNum)
+            if(players.size()>LGDeathSwapMod.getInstance().getPlayerNum())
             {
                 players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.getInstance().getModInfo()[0]+":欢迎加入死亡交换游戏！游戏已经开始，你现在处于旁观模式").formatted(Formatting.YELLOW),false);
                 players.get(players.size()-1).setGameMode(GameMode.SPECTATOR);
             }
-            LGDeathSwapMod.getInstance().playerNum = players.size();
+            LGDeathSwapMod.getInstance().setPlayerNum(players.size());
             for (ServerPlayerEntity player : players)
             {
                 if (player.getHealth() <= 0)
@@ -124,6 +129,7 @@ public class PlayerHealthDetectionThread implements Runnable
     }
     private void onPlayerDeath(ServerPlayerEntity player)
     {
+        System.out.println(player.getGameProfile().getName()+" Death");
         player.setGameMode(GameMode.SPECTATOR);
         Text msg = new LiteralText("You Death").formatted(Formatting.YELLOW);
         player.sendMessage(msg,true);
@@ -147,7 +153,7 @@ public class PlayerHealthDetectionThread implements Runnable
         }
         int SurvalPlayerNum=0;
         ServerPlayerEntity tmpPlayer = null;
-        List<ServerPlayerEntity> players = _server.getPlayerManager().getPlayerList();
+        List<ServerPlayerEntity> players = LGDeathSwapMod.getInstance().getMinecraftServer().getPlayerManager().getPlayerList();
         for(ServerPlayerEntity player : players)
         {
             if (player.interactionManager.getGameMode() == GameMode.SURVIVAL)
@@ -159,6 +165,7 @@ public class PlayerHealthDetectionThread implements Runnable
 
         if(SurvalPlayerNum==0)
         {
+            System.out.println("No Winner");
             winText = "No winner";
             for(ServerPlayerEntity player : players)
             {
@@ -169,7 +176,7 @@ public class PlayerHealthDetectionThread implements Runnable
         }
         if(SurvalPlayerNum==1&&players.size()!=1)
         {
-
+            System.out.println(tmpPlayer.getGameProfile().getName()+" Win");
             Text msg = new LiteralText("You Win").formatted(Formatting.YELLOW);
             tmpPlayer.sendMessage(msg,false);
             tmpPlayer.setGameMode(GameMode.SPECTATOR);

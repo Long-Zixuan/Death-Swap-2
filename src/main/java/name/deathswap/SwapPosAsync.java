@@ -13,13 +13,14 @@ import net.minecraft.world.GameMode;
 
 import java.util.List;
 
-
+import static name.deathswap.LGDeathSwapMod.LOGGER;
 
 public class SwapPosAsync extends Thread {
 
     @Override
-    public void start()
+    public void run()
     {
+        System.out.println("SwapPosAsync  Thread Name:" + getName()+" Thread ID:"+ getId());
         swapPos();
     }
     List<ServerPlayerEntity> _players;
@@ -41,7 +42,7 @@ public class SwapPosAsync extends Thread {
 
         if (alivePlayers.size() < 2)
         {
-            LGDeathSwapMod.getInstance().getLOGGER().info("没有足够的玩家进行游戏");
+            LOGGER.info("没有足够的玩家进行游戏");
             Text msg = new LiteralText("没有足够的玩家进行游戏").formatted(Formatting.YELLOW);
             _players.get(0).sendMessage(msg,false);
             return;

@@ -40,12 +40,7 @@ import java.util.List;
 
 public class LGDeathSwapMod implements ModInitializer
 {
-    private static final Logger LOGGER = LogManager.getLogger("death-swap-mod");
-
-	public Logger getLOGGER()
-	{
-		return LOGGER;
-	}
+    public static final Logger LOGGER = LogManager.getLogger("death-swap-mod");
 
 	private static LGDeathSwapMod _instance = null;
 
@@ -70,22 +65,40 @@ public class LGDeathSwapMod implements ModInitializer
 
 	long startTime = 0;
 
-	public int playerNum = 0;
+	private int _playerNum = 0;
+
+	public int getPlayerNum()
+	{
+		return _playerNum;
+	}
+
+	public void setPlayerNum(int value)
+	{
+		_playerNum = value;
+	}
 
 	//World world;
 	String _modAuthor = "LoongLy";
 
 	String _modName = "DeathSwap";
 
-	String _modVersion = "2.0.1";
-	String _lastEditTime = "2024/12/08";
+	String _modVersion = "2.1";
+	String _lastEditTime = "2024/12/10";
 
 	String []_modInfo = {_modAuthor,_modName,_modVersion,_lastEditTime};
-
 	public String[] getModInfo()
 	{
 		return _modInfo;
 	}
+
+	private MinecraftServer _server = null;
+
+	public MinecraftServer getMinecraftServer()
+	{
+		return _server;
+	}
+
+
 	@Override
 	public void onInitialize()
 	{
@@ -138,14 +151,29 @@ public class LGDeathSwapMod implements ModInitializer
 	private void initPlayerHealthDetectionAsync(MinecraftServer server)
 	{
 		System.out.println("Init PlayerHealthDetectionThread");
-		PlayerHealthDetectionThread.initInstance(server);
-		PlayerHealthDetectionThread.getInstance().startThread();
+		//PlayerHealthDetectionThread.initInstance(server);
+		_server = server;
+		try
+		{
+			PlayerHealthDetectionThread.getInstance().startThread();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	private void stopPlayerHealthDetectionAsync(MinecraftServer server)
 	{
 		System.out.println("Stop PlayerHealthDetectionThread");
 		_isGameStarting = false;
-		PlayerHealthDetectionThread.getInstance().stopTread();
+		try
+		{
+			PlayerHealthDetectionThread.getInstance().stopTread();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 		System.gc();
 	}
 
@@ -240,7 +268,7 @@ public class LGDeathSwapMod implements ModInitializer
 		startTime = Instant.now().getEpochSecond();
 		MinecraftServer server = source.getMinecraftServer();
 		List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
-		playerNum = players.size();
+		_playerNum = players.size();
 		if (players.size() < 2)
 		{
 			LOGGER.info("没有足够的玩家参与游戏");
