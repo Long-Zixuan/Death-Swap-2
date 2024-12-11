@@ -51,7 +51,7 @@ public class LGDeathSwapMod implements ModInitializer
 
 	private static final String MOD_AUTHOR = "LoongLy";
 	private static final String MOD_NAME = "DeathSwap";
-	private static final String MOD_VERSION = "2.1";
+	private static final String MOD_VERSION = "2.2";
 	private static final String MOD_LAST_EDIT_TIME = "2024/12/10";
 	public static final String []MOD_INFO = {MOD_AUTHOR,MOD_NAME,MOD_VERSION,MOD_LAST_EDIT_TIME};
 
@@ -107,7 +107,7 @@ public class LGDeathSwapMod implements ModInitializer
 		ServerTickEvents.START_SERVER_TICK.register(this::onServerTick);
 
 		CommandRegistrationCallback.EVENT.register(this::editSwapTime);
-		CommandRegistrationCallback.EVENT.register(this::editGameMode);
+		//CommandRegistrationCallback.EVENT.register(this::editGameMode);
 		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
 			dispatcher.register(CommandManager.literal("startdeathswap")
 					.executes(context -> {
@@ -195,7 +195,7 @@ public class LGDeathSwapMod implements ModInitializer
 	}
 
 
-	private void editGameMode(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated)
+	/*private void editGameMode(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated)
 	{
 		dispatcher.register(CommandManager.literal("gamemode")
 				.then(CommandManager.argument("gamemodeValue", StringArgumentType.word())
@@ -233,7 +233,7 @@ public class LGDeathSwapMod implements ModInitializer
 							context.getSource().sendFeedback(new LiteralText("您的游戏模式已更新"), false);
 							return 1;
 						})));
-	}
+	}*/
 
 
 	private void AboutMod(ServerCommandSource source)
@@ -254,6 +254,7 @@ public class LGDeathSwapMod implements ModInitializer
 
 	private void initStartGame(boolean needTransPos,ServerCommandSource source)
 	{
+		_resetPlayerCount = 0;
 		_startTime = Instant.now().getEpochSecond();
 		MinecraftServer server = source.getMinecraftServer();
 		List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
@@ -278,20 +279,33 @@ public class LGDeathSwapMod implements ModInitializer
 			}
 			else
 			{
-				player.setInvulnerable(false);
+				resetPlayer(player);
 				Text msg = new LiteralText("游戏开始!").formatted(Formatting.YELLOW);
 				player.sendMessage(msg,true);
 			}
-			player.setGameMode(GameMode.SURVIVAL);
-			player.setHealth(20);
-			player.setAir(300);
-			player.getHungerManager().setFoodLevel(20);
-			player.getHungerManager().setSaturationLevel(1.0F);
-			player.inventory.clear();
+
 			//msg = new LiteralText("游戏开始!").formatted(Formatting.YELLOW);
 			//player.sendMessage(msg,true);
 		}
-		_isGameStarting = true;
+		//_isGameStarting = true;
+	}
+
+	int _resetPlayerCount = 0;
+	public void resetPlayer(ServerPlayerEntity player)
+	{
+		_resetPlayerCount++;
+		player.setGameMode(GameMode.SURVIVAL);
+		player.setHealth(20);
+		player.setAir(300);
+		player.getHungerManager().setFoodLevel(20);
+		player.getHungerManager().setSaturationLevel(1.0F);
+		player.inventory.clear();
+		player.setInvulnerable(false);
+		System.out.println("reset player:"+player.getName());
+		if(_resetPlayerCount >= _playerNum)
+		{
+			_isGameStarting = true;
+		}
 	}
 	private void startGame(ServerCommandSource source)
 	{

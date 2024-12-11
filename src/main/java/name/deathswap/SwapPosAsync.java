@@ -10,6 +10,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
 
 import java.util.List;
 
@@ -20,10 +21,11 @@ public class SwapPosAsync extends Thread {
     @Override
     public void run()
     {
-        System.out.println("SwapPosAsync");
-        System.out.println("Thread Name"+"\t"+getName());
-        System.out.println("Thread ID"+"\t"+getId());
+        System.out.println("SwapPosAsync start");
+        System.out.println("Thread Name:"+"\t"+getName());
+        System.out.println("Thread ID:"+"\t"+getId());
         swapPos();
+        System.out.println("SwapPosAsync end");
     }
     List<ServerPlayerEntity> _players;
     public SwapPosAsync(List<ServerPlayerEntity> players)
@@ -57,6 +59,8 @@ public class SwapPosAsync extends Thread {
         double tempZ = player1.getZ();
 
         ServerWorld tmpWorld = player1.getServerWorld();
+        //World tmpWorld = player1.world;
+        System.out.println("Debug:"+player1+"            "+tmpWorld.toString());
 
         float tmpYaw = player1.getYaw(0);
         float tmpPitch = player1.getPitch(0);
@@ -65,13 +69,30 @@ public class SwapPosAsync extends Thread {
         {
             ServerPlayerEntity tmpPlayer = alivePlayers.get(i);
             //tmpPlayer.setWorld(alivePlayers.get(i+1).world);
-            tmpPlayer.teleport(alivePlayers.get(i+1).getServerWorld(),alivePlayers.get(i+1).getX(), alivePlayers.get(i+1).getY(), alivePlayers.get(i+1).getZ(),alivePlayers.get(i+1).getYaw(0),alivePlayers.get(i+1).getPitch(0));
+            try
+            {
+                tmpPlayer.teleport(alivePlayers.get(i+1).getServerWorld(),alivePlayers.get(i+1).getX(), alivePlayers.get(i+1).getY(), alivePlayers.get(i+1).getZ(),alivePlayers.get(i+1).getYaw(0),alivePlayers.get(i+1).getPitch(0));
+            }
+            catch (Exception e)
+            {
+                System.out.println("SwapPosAsync Exception:"+e.toString());
+            }
             Text msg = new LiteralText("你和玩家：" + alivePlayers.get(i+1).getGameProfile().getName()+"交换了位置").formatted(Formatting.YELLOW);
             tmpPlayer.sendMessage(msg,false);
+            System.out.println("Debug:"+tmpPlayer.toString());
         }
         ServerPlayerEntity lastPlayer = alivePlayers.get(alivePlayers.size()-1);
-        //lastPlayer.setWorld(tmpWorld);
-        lastPlayer.teleport(tmpWorld,tempX, tempY, tempZ,tmpYaw,tmpPitch);
+        Swap2:System.out.println("Lastplayer1:"+lastPlayer.toString());
+        try
+        {
+            lastPlayer.teleport(tmpWorld,tempX, tempY, tempZ,tmpYaw,tmpPitch);
+        }
+        catch (Exception e)
+        {
+            System.out.println("SwapPosAsync Exception:"+e.toString());
+        }
+
+        System.out.println("Lastplayer2:"+lastPlayer.toString());
         Text msg = new LiteralText("你和玩家：" + player1.getGameProfile().getName()+"交换了位置").formatted(Formatting.YELLOW);
         lastPlayer.sendMessage(msg,false);
         alivePlayers.clear();

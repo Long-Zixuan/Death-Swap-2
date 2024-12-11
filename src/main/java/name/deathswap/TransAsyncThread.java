@@ -23,19 +23,25 @@ public class TransAsyncThread extends Thread
     @Override
     public void run()
     {
-        System.out.println("TransAsyncThread");
-        System.out.println("Thread Name"+"\t"+getName());
-        System.out.println("Thread ID"+"\t"+getId());
-        Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.YELLOW);
+        System.out.println("TransAsyncThread start");
+        System.out.println("Thread Name:"+"\t"+getName());
+        System.out.println("Thread ID:"+"\t"+getId());
+        Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.RED);
         _player.sendMessage(msg,true);
+        //SendMSGThread sendMSGThread = new SendMSGThread("少女祈祷中",_player);//多用一个线程实现动态文字确实有意思，想了想资源和好看我还是选资源吧
+        //sendMSGThread.start();
+
         BlockPos safePos = findSafePos();
         if(safePos.getY() != ERROR_POS)
         {
             _player.teleport(safePos.getX(), safePos.getY() + 1, safePos.getZ());
-            msg = new LiteralText("游戏开始！").formatted(Formatting.YELLOW);
-            _player.sendMessage(msg,true);
+
+            LGDeathSwapMod.getInstance().resetPlayer(_player);
+            Text gameStart = new LiteralText("游戏开始！").formatted(Formatting.YELLOW);
+            _player.sendMessage(gameStart,true);
         }
-        _player.setInvulnerable(false);
+        //sendMSGThread.stopThread();
+        System.out.println("TransAsyncThread end");
     }
     private final ServerPlayerEntity _player;
     private final World _world;
@@ -63,9 +69,10 @@ public class TransAsyncThread extends Thread
     {
         if(_findPosCount > 10)
         {
-            String str = "尝试十次寻找安全坐标均失败，请检查世界设置";
+            String str = "尝试十次寻找安全坐标均失败，请检查世界设置,死亡交换游戏启动失败";
             Text msg = new LiteralText(str).formatted(Formatting.YELLOW);
             _player.sendMessage(msg, false);
+            LGDeathSwapMod.getInstance().setIsGameStarting(false);
             return new BlockPos(0,ERROR_POS,0);
         }
         Random random = new Random();
