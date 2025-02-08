@@ -15,7 +15,13 @@ import net.minecraft.util.Formatting;
 
 import net.minecraft.world.World;
 
-import cn.hutool.core.thread.ThreadUtil;
+//import cn.hutool.core.thread.ThreadUtil;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 public class TransAsyncThread extends Thread
@@ -30,7 +36,23 @@ public class TransAsyncThread extends Thread
         System.out.println("Thread ID:"+"\t"+getId());
 
 
-        ThreadUtil.execAsync(() ->
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+
+        Callable<Integer> callableTask = () -> {
+            System.out.println("SendMSGAsync start");
+            System.out.println("Thread Name:"+"\t"+getName());
+            System.out.println("Thread ID:"+"\t"+getId());
+
+            MSGAni("少女祈祷中");
+
+            System.out.println("SendMSGAsync end");
+            return 0;
+        };
+
+        Future<Integer> future = executor.submit(callableTask);
+
+
+        /*ThreadUtil.execAsync(() ->
         {
             System.out.println("SendMSGAsync start");
             System.out.println("Thread Name:"+"\t"+getName());
@@ -39,7 +61,8 @@ public class TransAsyncThread extends Thread
             MSGAni("少女祈祷中");
 
             System.out.println("SendMSGAsync end");
-        });
+        });*/
+
 
         //Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.RED);
         //_player.sendMessage(msg,true);
@@ -55,6 +78,7 @@ public class TransAsyncThread extends Thread
             _player.sendMessage(gameStart,true);
         }
         _loading = false;
+        executor.shutdown();
         System.out.println("TransAsyncThread end");
     }
 
