@@ -17,11 +17,7 @@ import net.minecraft.world.World;
 
 //import cn.hutool.core.thread.ThreadUtil;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 
 public class TransAsyncThread extends Thread
@@ -35,10 +31,8 @@ public class TransAsyncThread extends Thread
         System.out.println("Thread Name:"+"\t"+getName());
         System.out.println("Thread ID:"+"\t"+getId());
 
-
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-
-        Callable<Integer> callableTask = () -> {
+        //CompletableFuture<Void> future =
+        CompletableFuture.runAsync(() -> {
             System.out.println("SendMSGAsync start");
             System.out.println("Thread Name:"+"\t"+getName());
             System.out.println("Thread ID:"+"\t"+getId());
@@ -46,27 +40,7 @@ public class TransAsyncThread extends Thread
             MSGAni("少女祈祷中");
 
             System.out.println("SendMSGAsync end");
-            return 0;
-        };
-
-        Future<Integer> future = executor.submit(callableTask);
-
-
-        /*ThreadUtil.execAsync(() ->
-        {
-            System.out.println("SendMSGAsync start");
-            System.out.println("Thread Name:"+"\t"+getName());
-            System.out.println("Thread ID:"+"\t"+getId());
-
-            MSGAni("少女祈祷中");
-
-            System.out.println("SendMSGAsync end");
-        });*/
-
-
-        //Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.RED);
-        //_player.sendMessage(msg,true);
-
+        });
 
         BlockPos safePos = findSafePos();
         if(safePos.getY() != ERROR_POS)
@@ -78,7 +52,7 @@ public class TransAsyncThread extends Thread
             _player.sendMessage(gameStart,true);
         }
         _loading = false;
-        executor.shutdown();
+        //executor.shutdown();
         System.out.println("TransAsyncThread end");
     }
 
@@ -110,6 +84,7 @@ public class TransAsyncThread extends Thread
             try
             {
                 Thread.sleep(200);
+                //TimeUnit.SECONDS.sleep(1);
             }
             catch (InterruptedException e)
             {

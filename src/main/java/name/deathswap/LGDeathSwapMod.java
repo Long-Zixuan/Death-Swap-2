@@ -250,6 +250,13 @@ public class LGDeathSwapMod implements ModInitializer
 				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to jump to: " + "https://github.com/Long-Zixuan/Dealth-Swap")))
 				.withColor(Formatting.UNDERLINE));
 		source.sendFeedback(gitmsg, false);
+		Text supmsg = new LiteralText("请我喝杯奶茶吧（如果可以的话）").styled(style->style
+				.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://long-zixuan.github.io/html/support_me_old.html"))
+				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to jump to: " + "https://long-zixuan.github.io/html/support_me_old.html")))
+				.withColor(Formatting.UNDERLINE));
+
+		
+		source.sendFeedback(supmsg, false);
 	}
 
 	private void initStartGame(boolean needTransPos,ServerCommandSource source)
