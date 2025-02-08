@@ -15,21 +15,35 @@ import net.minecraft.util.Formatting;
 
 import net.minecraft.world.World;
 
+import cn.hutool.core.thread.ThreadUtil;
+
 
 public class TransAsyncThread extends Thread
 {
     private final int ERROR_POS = 1000;
-
+    boolean _loading = true;
     @Override
     public void run()
     {
         System.out.println("TransAsyncThread start");
         System.out.println("Thread Name:"+"\t"+getName());
         System.out.println("Thread ID:"+"\t"+getId());
-        Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.RED);
-        _player.sendMessage(msg,true);
-        //SendMSGThread sendMSGThread = new SendMSGThread("少女祈祷中",_player);//多用一个线程实现动态文字确实有意思，想了想资源和好看我还是选资源吧
-        //sendMSGThread.start();
+
+
+        ThreadUtil.execAsync(() ->
+        {
+            System.out.println("SendMSGAsync start");
+            System.out.println("Thread Name:"+"\t"+getName());
+            System.out.println("Thread ID:"+"\t"+getId());
+
+            MSGAni("少女祈祷中");
+
+            System.out.println("SendMSGAsync end");
+        });
+
+        //Text msg = new LiteralText("☯少女祈祷中。。。。☯").formatted(Formatting.RED);
+        //_player.sendMessage(msg,true);
+
 
         BlockPos safePos = findSafePos();
         if(safePos.getY() != ERROR_POS)
@@ -40,9 +54,47 @@ public class TransAsyncThread extends Thread
             Text gameStart = new LiteralText("游戏开始！").formatted(Formatting.YELLOW);
             _player.sendMessage(gameStart,true);
         }
-        //sendMSGThread.stopThread();
+        _loading = false;
         System.out.println("TransAsyncThread end");
     }
+
+    private void MSGAni(String _msg)
+    {
+        StringBuilder dotdot = new StringBuilder();
+        String finalMsg;
+        int dotCount = 0;
+        int dotLength = 4;
+        while (_loading)
+        {
+            dotdot = new StringBuilder();
+            for(int i=0;i<dotLength;i++)
+            {
+                if(i <= dotCount)
+                {
+                    dotdot.append("。");
+                }
+                else
+                {
+                    dotdot.append(" ");
+                }
+            }
+            finalMsg = "☯"+_msg+dotdot+"☯";
+            Text txt = new LiteralText(finalMsg).formatted(Formatting.RED);
+            _player.sendMessage(txt,true);
+            dotCount++;
+            dotCount = dotCount % dotLength;
+            try
+            {
+                Thread.sleep(200);
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     private final ServerPlayerEntity _player;
     private final World _world;
     public TransAsyncThread(ServerPlayerEntity player, World world)

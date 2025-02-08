@@ -9,6 +9,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
@@ -59,19 +60,16 @@ public class SwapPosAsync extends Thread {
         double tempZ = player1.getZ();
 
         ServerWorld tmpWorld = player1.getServerWorld();
-        //World tmpWorld = player1.world;
-        System.out.println("Debug:"+player1+"            "+tmpWorld.toString());
-
         float tmpYaw = player1.getYaw(0);
         float tmpPitch = player1.getPitch(0);
 
         for(int i = 0; i < alivePlayers.size()-1; i++)
         {
             ServerPlayerEntity tmpPlayer = alivePlayers.get(i);
-            //tmpPlayer.setWorld(alivePlayers.get(i+1).world);
             try
             {
                 tmpPlayer.teleport(alivePlayers.get(i+1).getServerWorld(),alivePlayers.get(i+1).getX(), alivePlayers.get(i+1).getY(), alivePlayers.get(i+1).getZ(),alivePlayers.get(i+1).getYaw(0),alivePlayers.get(i+1).getPitch(0));
+                alivePlayers.get(i+1).getServerWorld().tryLoadEntity(tmpPlayer);
             }
             catch (Exception e)
             {
@@ -82,17 +80,15 @@ public class SwapPosAsync extends Thread {
             System.out.println("Debug:"+tmpPlayer.toString());
         }
         ServerPlayerEntity lastPlayer = alivePlayers.get(alivePlayers.size()-1);
-        Swap2:System.out.println("Lastplayer1:"+lastPlayer.toString());
         try
         {
             lastPlayer.teleport(tmpWorld,tempX, tempY, tempZ,tmpYaw,tmpPitch);
+            tmpWorld.tryLoadEntity(lastPlayer);
         }
         catch (Exception e)
         {
-            System.out.println("SwapPosAsync Exception:"+e.toString());
+            System.out.println("SwapPosAsync Exception:"+e.toString()+" ["+tempX+","+tempY+","+tempZ+","+tmpWorld+"]");
         }
-
-        System.out.println("Lastplayer2:"+lastPlayer.toString());
         Text msg = new LiteralText("你和玩家：" + player1.getGameProfile().getName()+"交换了位置").formatted(Formatting.YELLOW);
         lastPlayer.sendMessage(msg,false);
         alivePlayers.clear();

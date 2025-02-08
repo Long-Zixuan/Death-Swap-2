@@ -46,7 +46,6 @@ public class PlayerHealthDetectionThread implements Runnable
     private volatile boolean _running = true;//CSDN说加个volatile比较好，那我就加咯，嘻嘻
     private final int SLEEP_TIME = 500;//半秒
 
-    //private LGDeathSwapMod lgDeathSwapModInstance = LGDeathSwapMod.getInstance();
     public void stopTread()
     {
         _running = false;
