@@ -56,7 +56,7 @@ public class PlayerHealthDetectionThread implements Runnable
     {
         while(_running)
         {
-            System.out.println("PlayerHealthDetectionAsync is running \nisGameStarting:"+LGDeathSwapMod.getInstance().getIsGameStarting());
+            //System.out.println("PlayerHealthDetectionAsync is running \nisGameStarting:"+LGDeathSwapMod.getInstance().getIsGameStarting());
             playerHealthDetection();
             try
             {

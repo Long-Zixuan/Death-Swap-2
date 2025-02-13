@@ -32,8 +32,7 @@ dependencies {
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 	//implementation 'cn.hutool:hutool-all:5.7.10'
-	implementation 'cn.hutool:hutool-all:5.8.24'
-	//compile 'cn.hutool:hutool-all:5.8.24'
+	//implementation 'cn.hutool:hutool-all:5.8.24'
 }
 
 processResources {

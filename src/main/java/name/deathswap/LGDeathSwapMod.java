@@ -1,6 +1,7 @@
 package name.deathswap;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
+//import cn.hutool.core.thread.NamedThreadFactory;
+//import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -34,8 +35,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import java.time.Instant;
 
 import java.util.List;
-
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class LGDeathSwapMod implements ModInitializer
@@ -53,6 +54,8 @@ public class LGDeathSwapMod implements ModInitializer
 	private static final String MOD_NAME = "DeathSwap";
 	private static final String MOD_VERSION = "2.2";
 	private static final String MOD_LAST_EDIT_TIME = "2024/12/10";
+
+	private static ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 	public static final String []MOD_INFO = {MOD_AUTHOR,MOD_NAME,MOD_VERSION,MOD_LAST_EDIT_TIME};
 
 	int _deathSwapTime = 300;
@@ -64,6 +67,7 @@ public class LGDeathSwapMod implements ModInitializer
 	}
 	public void setIsGameStarting(boolean value)
 	{
+		System.out.println("setIsGameStarting:"+value);
 		_isGameStarting = value;
 	}
 
@@ -255,7 +259,7 @@ public class LGDeathSwapMod implements ModInitializer
 				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to jump to: " + "https://long-zixuan.github.io/html/support_me_old.html")))
 				.withColor(Formatting.UNDERLINE));
 
-		
+
 		source.sendFeedback(supmsg, false);
 	}
 
@@ -282,7 +286,8 @@ public class LGDeathSwapMod implements ModInitializer
 			{
 				World world = player.world;
 				TransAsyncThread asyncThread = new TransAsyncThread(player,world);
-				asyncThread.start();
+				//asyncThread.start();
+				cachedThreadPool.execute(asyncThread);
 			}
 			else
 			{

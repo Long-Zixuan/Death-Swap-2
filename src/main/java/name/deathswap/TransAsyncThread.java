@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import java.util.concurrent.*;
 
 
-public class TransAsyncThread extends Thread
+public class TransAsyncThread implements Runnable
 {
     private final int ERROR_POS = 1000;
     boolean _loading = true;
@@ -28,14 +28,14 @@ public class TransAsyncThread extends Thread
     public void run()
     {
         System.out.println("TransAsyncThread start");
-        System.out.println("Thread Name:"+"\t"+getName());
-        System.out.println("Thread ID:"+"\t"+getId());
+        System.out.println("Thread Name:"+"\t"+Thread.currentThread().getName());
+        System.out.println("Thread ID:"+"\t"+Thread.currentThread().getId());
 
         //CompletableFuture<Void> future =
         CompletableFuture.runAsync(() -> {
             System.out.println("SendMSGAsync start");
-            System.out.println("Thread Name:"+"\t"+getName());
-            System.out.println("Thread ID:"+"\t"+getId());
+            System.out.println("Thread Name:"+"\t"+Thread.currentThread().getName());
+            System.out.println("Thread ID:"+"\t"+Thread.currentThread().getId());
 
             MSGAni("少女祈祷中");
 
