@@ -1,7 +1,7 @@
 {
   "lds.game.running":  "The game is in progress and the time cannot be changed",
   "lds.no.enough.player": "There are not enough players participating in the game",
-  "lds.game.start":  "The game is starting",
+  "lds.game.start":  "Game Start！",
   "lds.swap.at.1":  "The swap will start in 1 second",
   "lds.swap.at.2":  "The swap will start in 2 seconds",
   "lds.swap.at.3":  "The swap will start in 3 seconds",
@@ -9,12 +9,12 @@
   "lds.swap.at.5":  "The swap will start in 5 seconds",
   "lds.swap.time.least": "The swap time shall not be less than 40 seconds",
   "lds.swap.time.swap.to": "swap time updated to:",
-  "lds.welcome":  "Welcome to the death swap game",
-  "lds.welcome.running": "Welcome to the death swap game! The game has started and you are now in spectator mode",
+  "lds.welcome":  ":Welcome to the death swap game",
+  "lds.welcome.running": ":Welcome to the death swap game! The game has started and you are now in spectator mode",
   "lds.winner.is":  "The winner is:",
   "lds.you.change.with":  "You swaped position with:",
   "lds.you.change.with2":  " ",
   "lds.loading":  "Loading",
   "lds.error1": "Ten attempts to find safe coordinates have failed. Please check the world settings as the Death Swap game failed to start",
-  "lds.start":  "The game is starting"
+  "lds.start":  "The game has started"
 }
