@@ -17,7 +17,15 @@ import java.util.List;
 
 import static name.deathswap.LGDeathSwapMod.LOGGER;
 
+import net.minecraft.text.TranslatableText;
+import net.minecraft.client.resource.language.I18n;
+
 public class SwapPosAsync extends Thread {
+
+    private final static String noEnoughPlayerKey = "lds.no.enough.player";//没有足够的玩家进行游戏
+    private final static String youChangeWithKey = "lds.you.change.with";//你和玩家：
+    private final static String youChangeWithKey2 = "lds.you.change.with2";//交换了位置;
+
 
     @Override
     public void run()
@@ -48,7 +56,7 @@ public class SwapPosAsync extends Thread {
         if (alivePlayers.size() < 2)
         {
             LOGGER.info("没有足够的玩家进行游戏");
-            Text msg = new LiteralText("没有足够的玩家进行游戏").formatted(Formatting.YELLOW);
+            Text msg = new LiteralText(I18n.translate(noEnoughPlayerKey)).formatted(Formatting.YELLOW);
             _players.get(0).sendMessage(msg,false);
             return;
         }
@@ -75,7 +83,7 @@ public class SwapPosAsync extends Thread {
             {
                 System.out.println("SwapPosAsync Exception:"+e.toString());
             }
-            Text msg = new LiteralText("你和玩家：" + alivePlayers.get(i+1).getGameProfile().getName()+"交换了位置").formatted(Formatting.YELLOW);
+            Text msg = new LiteralText(I18n.translate(youChangeWithKey) + alivePlayers.get(i+1).getGameProfile().getName()+I18n.translate(youChangeWithKey2)).formatted(Formatting.YELLOW);
             tmpPlayer.sendMessage(msg,false);
             System.out.println("Debug:"+tmpPlayer.toString());
         }
@@ -89,7 +97,7 @@ public class SwapPosAsync extends Thread {
         {
             System.out.println("SwapPosAsync Exception:"+e.toString()+" ["+tempX+","+tempY+","+tempZ+","+tmpWorld+"]");
         }
-        Text msg = new LiteralText("你和玩家：" + player1.getGameProfile().getName()+"交换了位置").formatted(Formatting.YELLOW);
+        Text msg = new LiteralText(I18n.translate(youChangeWithKey) + player1.getGameProfile().getName()+I18n.translate(youChangeWithKey2)).formatted(Formatting.YELLOW);
         lastPlayer.sendMessage(msg,false);
         alivePlayers.clear();
     }

@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+//import net.minecraft.text.TranslatableText;
+import net.minecraft.client.resource.language.I18n;
+
 
 public class LGDeathSwapMod implements ModInitializer
 {
@@ -52,9 +55,26 @@ public class LGDeathSwapMod implements ModInitializer
 
 	private static final String MOD_AUTHOR = "LoongLy";
 	private static final String MOD_NAME = "DeathSwap";
-	private static final String MOD_VERSION = "2.2";
-	private static final String MOD_LAST_EDIT_TIME = "2024/12/10";
+	private static final String MOD_VERSION = "2.3";
+	private static final String MOD_LAST_EDIT_TIME = "2024/03/04";
+/////////////////////////////////////////////////////////////////////////////
+	private final static String gameRunningKey = "lds.game.running"; //游戏正在进行，不能更改时间
 
+	private final static String noEnoughPlayerKey = "lds.no.enough.player";//没有足够的玩家参与游戏
+
+	private final static String gameStartKey = "lds.game.start";//游戏开始!
+
+	private final static String swatAt1Key = "lds.swap.at.1";//交换将在1秒后开始
+	private final static String swatAt2Key = "lds.swap.at.2";//交换将在2秒后开始
+	private final static String swatAt3Key = "lds.swap.at.3";//交换将在3秒后开始
+	private final static String swatAt4Key = "lds.swap.at.4";//交换将在4秒后开始
+	private final static String swatAt5Key = "lds.swap.at.5";//交换将在5秒后开始
+
+	private final static String swapTimeLeastKey = "lds.swap.time.least";//交换时间不得小于40秒
+
+	private final static String swapTimeExchangeToKey = "lds.swap.time.exchange.to";//交换时间更新为：
+
+//////////////////////////////////////////////////////////////////////////////////////////////
 	private static ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 	public static final String []MOD_INFO = {MOD_AUTHOR,MOD_NAME,MOD_VERSION,MOD_LAST_EDIT_TIME};
 
@@ -180,20 +200,20 @@ public class LGDeathSwapMod implements ModInitializer
 						.executes(context -> {
 							if(_isGameStarting)
 							{
-								context.getSource().sendFeedback(new LiteralText("游戏正在进行，不能更改时间"), false);
+								context.getSource().sendFeedback(new LiteralText(I18n.translate(gameRunningKey)), false);
 								return 1;
 							}
 							// 获取命令参数中的值
 							int swaptime = IntegerArgumentType.getInteger(context, "value");
 							if(swaptime<40)
 							{
-								context.getSource().sendFeedback(new LiteralText("交换时间不得小于40秒"), false);
+								context.getSource().sendFeedback(new LiteralText(I18n.translate(swapTimeLeastKey)), false);
 								return 1;
 							}
 							// 更新变量的值
 							_deathSwapTime = swaptime;
 							// 发送消息给执行命令的玩家
-							context.getSource().sendFeedback(new LiteralText("交换时间更新为： " + swaptime), false);
+							context.getSource().sendFeedback(new LiteralText(I18n.translate(swapTimeExchangeToKey) + swaptime), false);
 							return 1;
 						})));
 	}
@@ -273,7 +293,7 @@ public class LGDeathSwapMod implements ModInitializer
 		if (players.size() < 2)
 		{
 			LOGGER.info("没有足够的玩家参与游戏");
-			Text msg = new LiteralText("没有足够的玩家参与游戏").formatted(Formatting.YELLOW);
+			Text msg = new LiteralText(I18n.translate(noEnoughPlayerKey)).formatted(Formatting.YELLOW);
 			players.get(0).sendMessage(msg,true);
 			return;
 		}
@@ -292,7 +312,7 @@ public class LGDeathSwapMod implements ModInitializer
 			else
 			{
 				resetPlayer(player);
-				Text msg = new LiteralText("游戏开始!").formatted(Formatting.YELLOW);
+				Text msg = new LiteralText(I18n.translate(gameStartKey)).formatted(Formatting.YELLOW);
 				player.sendMessage(msg,true);
 			}
 
@@ -363,27 +383,27 @@ public class LGDeathSwapMod implements ModInitializer
 		//以下是屎山代码
 		if (deltaTime==_deathSwapTime-1&&shouldSendMSG)
 		{
-			sendMSGForEveryPlayer(minecraftServer,"交换将在1秒后开始");
+			sendMSGForEveryPlayer(minecraftServer,I18n.translate(swatAt1Key));
 			shouldSendMSG = false;
 		}
 		else if (deltaTime==_deathSwapTime-2&&!shouldSendMSG)
 		{
-			sendMSGForEveryPlayer(minecraftServer,"交换将在2秒后开始");
+			sendMSGForEveryPlayer(minecraftServer,I18n.translate(swatAt2Key));
 			shouldSendMSG = true;
 		}
 		else if (deltaTime==_deathSwapTime-3&&shouldSendMSG)
 		{
-			sendMSGForEveryPlayer(minecraftServer,"交换将在3秒后开始");
+			sendMSGForEveryPlayer(minecraftServer,I18n.translate(swatAt3Key));
 			shouldSendMSG = false;
 		}
 		else if (deltaTime==_deathSwapTime-4&&!shouldSendMSG)
 		{
-			sendMSGForEveryPlayer(minecraftServer,"交换将在4秒后开始");
+			sendMSGForEveryPlayer(minecraftServer,I18n.translate(swatAt4Key));
 			shouldSendMSG = true;
 		}
 		else if (deltaTime==_deathSwapTime-5&&shouldSendMSG)
 		{
-			sendMSGForEveryPlayer(minecraftServer,"交换将在5秒后开始");
+			sendMSGForEveryPlayer(minecraftServer,I18n.translate(swatAt5Key));
 			shouldSendMSG = false;
 		}
 

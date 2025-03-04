@@ -1,6 +1,8 @@
 package name.deathswap;
 
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.server.network.ServerPlayerEntity;
+//import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Random;
@@ -14,6 +16,7 @@ import net.minecraft.util.Formatting;
 
 
 import net.minecraft.world.World;
+//import org.lwjgl.system.CallbackI;
 
 //import cn.hutool.core.thread.ThreadUtil;
 
@@ -22,6 +25,10 @@ import java.util.concurrent.*;
 
 public class TransAsyncThread implements Runnable
 {
+    private final String loadingKey = "lds.loading";//少女祈祷中
+    private final String error1Key = "lds.error1";//尝试十次寻找安全坐标均失败，请检查世界设置,死亡交换游戏启动失败
+    private final String gameStartKey = "lds.start";//游戏开始！
+
     private final int ERROR_POS = 1000;
     boolean _loading = true;
     @Override
@@ -37,7 +44,7 @@ public class TransAsyncThread implements Runnable
             System.out.println("Thread Name:"+"\t"+Thread.currentThread().getName());
             System.out.println("Thread ID:"+"\t"+Thread.currentThread().getId());
 
-            MSGAni("少女祈祷中");
+            MSGAni(I18n.translate(loadingKey));
 
             System.out.println("SendMSGAsync end");
         });
@@ -48,7 +55,7 @@ public class TransAsyncThread implements Runnable
             _player.teleport(safePos.getX(), safePos.getY() + 1, safePos.getZ());
 
             LGDeathSwapMod.getInstance().resetPlayer(_player);
-            Text gameStart = new LiteralText("游戏开始！").formatted(Formatting.YELLOW);
+            Text gameStart = new LiteralText(I18n.translate(gameStartKey)).formatted(Formatting.YELLOW);
             _player.sendMessage(gameStart,true);
         }
         _loading = false;
@@ -120,7 +127,7 @@ public class TransAsyncThread implements Runnable
     {
         if(_findPosCount > 10)
         {
-            String str = "尝试十次寻找安全坐标均失败，请检查世界设置,死亡交换游戏启动失败";
+            String str = I18n.translate(error1Key);
             Text msg = new LiteralText(str).formatted(Formatting.YELLOW);
             _player.sendMessage(msg, false);
             LGDeathSwapMod.getInstance().setIsGameStarting(false);

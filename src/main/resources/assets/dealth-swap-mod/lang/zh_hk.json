@@ -1,0 +1,20 @@
+{
+  "lds.game.running":  "遊戲正在進行,不能更改時間",
+  "lds.no.enough.player": "沒有足够的玩家參與遊戲",
+  "lds.game.start":  "遊戲開始！",
+  "lds.swap.at.1":  "交換將在1秒後開始",
+  "lds.swap.at.2":  "交換將在2秒後開始",
+  "lds.swap.at.3":  "交換將在3秒後開始",
+  "lds.swap.at.4":  "交換將在4秒後開始",
+  "lds.swap.at.5":  "交換將在5秒後開始",
+  "lds.swap.time.least": "交換時間不得小於40秒",
+  "lds.swap.time.exchange.to": "交換時間更新為：",
+  "lds.welcome":  "：歡迎加入死亡交換遊戲！",
+  "lds.welcome.running": "：歡迎加入死亡交換遊戲！遊戲已經開始,你現在處於旁觀模式",
+  "lds.winner.is":  "勝利者是：",
+  "lds.you.change.with":  "你和玩家：",
+  "lds.you.change.with2":  "交換了位置；",
+  "lds.loading":  "少女祈禱中",
+  "lds.error1": "嘗試十次尋找安全座標均失敗,請檢查世界設定,死亡交換遊戲啟動失敗",
+  "lds.start":  "遊戲開始！"
+}

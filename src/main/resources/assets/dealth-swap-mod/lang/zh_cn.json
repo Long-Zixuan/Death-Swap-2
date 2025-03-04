@@ -1,0 +1,20 @@
+{
+  "lds.game.running": "游戏正在进行，不能更改时间",
+  "lds.no.enough.player":"没有足够的玩家参与游戏",
+  "lds.game.start": "游戏开始!",
+  "lds.swap.at.1": "交换将在1秒后开始",
+  "lds.swap.at.2": "交换将在2秒后开始",
+  "lds.swap.at.3": "交换将在3秒后开始",
+  "lds.swap.at.4": "交换将在4秒后开始",
+  "lds.swap.at.5": "交换将在5秒后开始",
+  "lds.swap.time.least":"交换时间不得小于40秒",
+  "lds.swap.time.exchange.to":"交换时间更新为：",
+  "lds.welcome": ":欢迎加入死亡交换游戏！",
+  "lds.welcome.running":":欢迎加入死亡交换游戏！游戏已经开始，你现在处于旁观模式",
+  "lds.winner.is": "胜利者是:",
+  "lds.you.change.with": "你和玩家：",
+  "lds.you.change.with2": "交换了位置;",
+  "lds.loading": "少女祈祷中",
+  "lds.error1":"尝试十次寻找安全坐标均失败，请检查世界设置,死亡交换游戏启动失败",
+  "lds.start": "游戏开始！"
+}

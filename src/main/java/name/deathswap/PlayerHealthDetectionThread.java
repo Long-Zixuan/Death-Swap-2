@@ -10,6 +10,9 @@ import net.minecraft.util.Formatting;
 
 import net.minecraft.world.GameMode;
 
+import net.minecraft.text.TranslatableText;
+import net.minecraft.client.resource.language.I18n;
+
 
 import java.util.List;
 
@@ -17,6 +20,10 @@ import static name.deathswap.LGDeathSwapMod.LOGGER;
 
 public class PlayerHealthDetectionThread implements Runnable
 {
+    private static final String welcomeKey = "lds.welcome";//:欢迎加入死亡交换游戏！
+    private static final String welcomeButGameRunning = "lds.welcome.running";//:欢迎加入死亡交换游戏！游戏已经开始，你现在处于旁观模式
+    private static final String winnerIsKey = "lds.winner.is";//胜利者是:
+
     private static PlayerHealthDetectionThread _instance = null;
     public static PlayerHealthDetectionThread getInstance()
     {
@@ -92,7 +99,7 @@ public class PlayerHealthDetectionThread implements Runnable
         {
             if(players.size()>LGDeathSwapMod.getInstance().getPlayerNum())
             {
-                players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.MOD_INFO[0]+":欢迎加入死亡交换游戏！").formatted(Formatting.YELLOW),false);
+                players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.MOD_INFO[0]+I18n.translate(welcomeKey)).formatted(Formatting.YELLOW),false);
             }
             LGDeathSwapMod.getInstance().setPlayerNum(players.size());
             return;
@@ -101,7 +108,7 @@ public class PlayerHealthDetectionThread implements Runnable
         {
             if(players.size()>LGDeathSwapMod.getInstance().getPlayerNum())
             {
-                players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.MOD_INFO[0]+":欢迎加入死亡交换游戏！游戏已经开始，你现在处于旁观模式").formatted(Formatting.YELLOW),false);
+                players.get(players.size()-1).sendMessage(new LiteralText(LGDeathSwapMod.MOD_INFO[0]+I18n.translate(welcomeButGameRunning)).formatted(Formatting.YELLOW),false);
                 players.get(players.size()-1).setGameMode(GameMode.SPECTATOR);
             }
             LGDeathSwapMod.getInstance().setPlayerNum(players.size());
@@ -173,7 +180,7 @@ public class PlayerHealthDetectionThread implements Runnable
             _winText = "Winner is:" + tmpPlayer.getGameProfile().getName();
             for(ServerPlayerEntity player : players)
             {
-                Text msg2 = new LiteralText("胜利者是:" + tmpPlayer.getGameProfile().getName()).formatted(Formatting.YELLOW);
+                Text msg2 = new LiteralText(I18n.translate(winnerIsKey) + tmpPlayer.getGameProfile().getName()).formatted(Formatting.YELLOW);
                 player.sendMessage(msg2,true);
                 LGDeathSwapMod.getInstance().playAnvilFallSound(player, SoundEvents.ENTITY_PLAYER_LEVELUP);
             }
