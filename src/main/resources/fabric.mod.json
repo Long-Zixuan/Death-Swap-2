@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "death-swap-mod",
-	"version": "2.2.2.1",
+	"version": "2.3.1",
 	"name": "Death Swap Mod",
 	"description": "Dream同款死亡交换游戏！",
 	"authors": [
@@ -9,10 +9,19 @@
 	],
 	"contact": {
 		"homepage": "https://mod.3dmgame.com/mod/207510",
-		"sources": "https://github.com/Long-Zixuan/Death-Swap-2"
+		"sources": "https://github.com/Long-Zixuan/Death-Swap-2",
+		"modrinth": "https://modrinth.com/mod/sodium-device-check"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/dealth-swap-mod/LZXLogo.png",
+	"icon": "assets/dealth-swap-mod/LZX_INF.png",
+	"custom":
+	{
+		"links":
+		{
+			"modmenu.modrinth": "https://modrinth.com/mod/sodium-device-check"
+		}
+	},
+
 	"environment": "*",
 	"entrypoints": {
 		"main": [

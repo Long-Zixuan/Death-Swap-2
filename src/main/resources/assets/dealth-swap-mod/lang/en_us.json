@@ -8,7 +8,7 @@
   "lds.swap.at.4":  "The swap will start in 4 seconds",
   "lds.swap.at.5":  "The swap will start in 5 seconds",
   "lds.swap.time.least": "The swap time shall not be less than 40 seconds",
-  "lds.swap.time.swap.to": "swap time updated to:",
+  "lds.swap.time.exchange.to": "swap time updated to:",
   "lds.welcome":  ":Welcome to the death swap game",
   "lds.welcome.running": ":Welcome to the death swap game! The game has started and you are now in spectator mode",
   "lds.winner.is":  "The winner is:",
